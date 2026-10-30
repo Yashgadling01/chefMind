@@ -7,17 +7,53 @@ from fastapi import FastAPI,HTTPException
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 
+class IngredientCategory(str, Enum):
+    vegetable = "vegetable"
+    fruit = "fruit"
+    protein = "protein"
+    grain = "grain"
+    legume = "legume"
+    dairy = "dairy"
+    spice = "spice"
+    herb = "herb"
+    oil = "oil"
+    sauce = "sauce"
+    condiment = "condiment"
+    sweetener = "sweetener"
+    nut = "nut"
+    seed = "seed"
+    fungus = "fungus"
+    seafood = "seafood"
 
+class CookingMethod(str, Enum):
+    boil = "boil"
+    steam = "steam"
+    roast = "roast"
+    bake = "bake"
+    grill = "grill"
+    fry = "fry"
+    deep_fry = "deep_fry"
+    shallow_fry = "shallow_fry"
+    pan_fry = "pan_fry"
+    saute = "saute"
+    stir_fry = "stir_fry"
+    sear = "sear"
+    braise = "braise"
+    pressure_cook = "pressure_cook"
+    air_fry = "air_fry"
+    caramelize = "caramelize"    
 
-
+Score = Annotated[float, Field(ge=0, le=10)]
 
 class IngredientCreate(BaseModel):
-    name: Annotated[str, Field(min_length=1)]
-    category: str
-    description: str
-    cooking_methods: list[str] = Field(min_length=1)
-    taste_profile: dict[str, float]
-    texture_profile: dict[str, float]
+    model_config = ConfigDict(use_enum_values=True)
+
+    name: Annotated[str, Field(min_length=1, max_length=100)]
+    category: IngredientCategory
+    description: Annotated[str, Field(min_length=1)]
+    cooking_methods: list[CookingMethod] = Field(min_length=1)
+    taste_profile: dict[str, Score]
+    texture_profile: dict[str, Score]
 
 
 @asynccontextmanager
