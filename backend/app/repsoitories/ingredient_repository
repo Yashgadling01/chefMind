@@ -1,0 +1,50 @@
+
+from pymongo.errors import DuplicateKeyError
+
+
+COLLATION = {
+    "locale": "en",
+    "strength": 2
+}
+
+
+class IngredientRepository:
+
+    def __init__(self, collection):
+        self.collection = collection
+
+    def get_all(self, category=None):
+
+        query = {}
+
+        if category:
+            query["category"] = category.value
+
+        return list(self.collection.find(query))
+
+    def get_by_name(self, name):
+
+        return self.collection.find_one(
+            {"name": name},
+            collation=COLLATION
+        )
+
+    def create(self, data):
+
+        result = self.collection.insert_one(data)
+
+        return str(result.inserted_id)
+
+    def update(self, ingredient_id, data):
+
+        return self.collection.update_one(
+            {"_id": ingredient_id},
+            {"$set": data}
+        )
+
+    def delete(self, name):
+
+        return self.collection.delete_one(
+            {"name": name},
+            collation=COLLATION
+        )
